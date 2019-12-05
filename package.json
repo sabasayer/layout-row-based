@@ -1,11 +1,18 @@
 {
-  "name": "layout-row-based",
+  "name": "@sabasayer/layout-row-based",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
+    "build-modern": "vue-cli-service build --modern",
+    "build-modern-lib": "vue-cli-service build --modern --target lib --name vue-dynamic-grids ./src/components/index.ts",
+    "build-modern-wc": "vue-cli-service build --modern --target wc --name vue-dynamic-grids ./src/components/*.vue",
+    "build-modern-wc-async": "vue-cli-service build --modern --target wc-async --name vue-dynamic-grids ./src/components/*.vue",
+    "build-lib": "vue-cli-service build --target lib --name vue-dynamic-grids ./src/components/index.ts",
+    "build-wc": "vue-cli-service build --target wc --name vue-dynamic-grids ./src/components/*.vue",
+    "build-wc-async": "vue-cli-service build --target wc-async --name vue-dynamic-grids ./src/components/*.vue",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
@@ -14,6 +21,22 @@
     "vue-class-component": "^7.0.2",
     "vue-property-decorator": "^8.3.0"
   },
+  "files": [
+    "dist/*",
+    "src/*",
+    "public/*",
+    "*.json",
+    "*.js",
+    "types/*"
+  ],
+  "author": "Salih Baki Sayer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sabasayer/vue-dynamic-grids.git"
+  },
+  "types": "types/components/index.d.ts",
+  "homepage": "https://github.com/sabasayer/vue-dynamic-grids#readme",
+  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^24.0.19",
     "@vue/cli-plugin-babel": "^4.1.0",
