@@ -1,6 +1,6 @@
 {
   "name": "@sabasayer/layout-row-based",
-  "version": "0.1.0",
+  "version": "1.0.4",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -14,6 +14,8 @@
     "build-wc-async": "vue-cli-service build --target wc-async --name layout-row-based ./src/components/*.vue",
     "lint": "vue-cli-service lint"
   },
+  "main": "./dist/layout-row-based.common.js",
+  "unpkg": "./dist/layout-row-based.umd.min.js",
   "dependencies": {
     "@shopify/draggable": "^1.0.0-beta.8",
     "core-js": "^3.4.3",

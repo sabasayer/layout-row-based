@@ -1,21 +1,28 @@
 <template>
     <div ref="container" class="layout-container">
+        <div v-if="editMode" class="layout-container__settings">
+            <v-button v-if="cloneRows.length > 0" @click="removeRow" icon="minus" />
+            <v-button @click="addRow" icon="plus" />
+        </div>
         <layout-container-row
-            v-for="(row, i) in rows"
+            v-for="(row, i) in cloneRows"
             :key="i+'_'+key"
             :row="row"
+            @update:row="onRowUpdated(...arguments,i)"
             :edit-mode="editMode"
         >
             <template #default="{col}">
-                <layout-container-item
-                    v-for="(item, j) in getItems(row.row, col)"
-                    :item="item"
-                    :key="j"
-                >
-                    <slot :id="item.id">
-                        row : {{ row.row }}, col : {{ col }}
-                    </slot>
-                </layout-container-item>
+                <slot name="col-before" :col="col" :row="row"></slot>
+                <slot name="col" :col="col" :row="row">
+                    <layout-container-item
+                        v-for="(item, j) in getItems(row.row, col)"
+                        :item="item"
+                        :key="j"
+                    >
+                        <slot :id="item.id"></slot>
+                    </layout-container-item>
+                </slot>
+                <slot name="col-after" :col="col" :row="row"></slot>
             </template>
         </layout-container-row>
     </div>
@@ -23,35 +30,43 @@
 
 <script lang="ts">
 import { Component, Vue, Prop, Watch } from "vue-property-decorator";
-import { LayoutItem, LayoutRow } from "../../types/lib/layout-row";
+import { LayoutItem, LayoutRow } from "../lib/layout-row";
 import cloneDeep from "lodash/cloneDeep";
-import LayoutContainerRow from "@/components/LayoutContainerRow.vue";
+import LayoutContainerRow from "./LayoutContainerRow.vue";
 import { Draggable, Droppable } from "@shopify/draggable";
-import {
-    DragMoveEvent,
-    DroppableDroppedEvent
-} from "../../types/lib/shopify-events";
-import LayoutContainerItem from "@/components/LayoutContainerItem.vue";
+import { DragMoveEvent, DroppableDroppedEvent } from "../lib/shopify-events";
+import LayoutContainerItem from "./LayoutContainerItem.vue";
+import ButtonComponent from "./button.vue";
 
 @Component({
-    components: { LayoutContainerItem, LayoutContainerRow }
+    components: {
+        LayoutContainerItem,
+        LayoutContainerRow,
+        "v-button": ButtonComponent
+    }
 })
 export default class LayoutContainerComponent extends Vue {
     @Prop() readonly layoutItems!: LayoutItem[];
     @Prop() readonly rows!: LayoutRow[];
     @Prop({ type: Boolean, default: false }) readonly editMode!: boolean;
 
+    cloneRows: LayoutRow[] = [];
     cloneLayoutItems: LayoutItem[] = [];
-    key:number = 0;
+    key: number = 0;
 
     get getItems() {
         return (row: number, col: number) => {
             return this.layoutItems
-                ? this.layoutItems.filter(
-                      e => e.row == row && e.column == col
-                  )
+                ? this.layoutItems.filter(e => e.row == row && e.column == col)
                 : undefined;
         };
+    }
+
+    @Watch("rows", { immediate: true, deep: true })
+    onRowsChanged() {
+        if (this.rows) {
+            this.cloneRows = cloneDeep(this.rows);
+        } else this.cloneRows = [];
     }
 
     @Watch("layoutItems", { immediate: true, deep: true })
@@ -68,7 +83,7 @@ export default class LayoutContainerComponent extends Vue {
     }
 
     updateLayoutItems() {
-        this.$emit("update:layoutItems",this.cloneLayoutItems);
+        this.$emit("update:layoutItems", this.cloneLayoutItems);
     }
 
     initDragEvents() {
@@ -88,8 +103,12 @@ export default class LayoutContainerComponent extends Vue {
         let dropArea = e.data.dropzone;
         let dragItem = e.data.dragEvent.data.originalSource;
 
-        let areaRow = +(dropArea.attributes.getNamedItem("data-row")?.value ?? 0);
-        let areaCol = +(dropArea.attributes.getNamedItem("data-col")?.value ?? 0);
+        let areaRow = +(
+            dropArea.attributes.getNamedItem("data-row")?.value ?? 0
+        );
+        let areaCol = +(
+            dropArea.attributes.getNamedItem("data-col")?.value ?? 0
+        );
 
         let dragItemId = dragItem.attributes.getNamedItem("data-id")?.value;
 
@@ -98,35 +117,47 @@ export default class LayoutContainerComponent extends Vue {
         if (!item) return;
 
         let oldRow = item.row;
-        let oldCol = item.column
-
+        let oldCol = item.column;
 
         if (areaRow != oldRow) item.row = +areaRow;
         if (areaCol != oldCol) item.column = +areaCol;
 
-
-        if(areaRow != oldRow && areaCol != oldCol)
-        {
+        if (areaRow != oldRow && areaCol != oldCol) {
             this.key++;
-            this.updateLayoutItems()
+            this.updateLayoutItems();
         }
-
-        console.log("droppable:dropped", areaRow, areaRow, dragItemId, item);
     }
+
+    onRowUpdated(row: LayoutRow, i: number) {
+        this.$set(this.cloneRows, i, row);
+        this.$emit("update:rows", this.cloneRows);
+    }
+
+    addRow(){
+        this.cloneRows.push({
+            row:this.cloneRows.length+1,
+            columns:1
+        })
+    }
+
+    removeRow(){
+        this.cloneRows.splice(this.cloneRows.length-1,1);
+    }   
 }
 </script>
 
 <style scoped>
 .layout-container {
     display: block;
-    background-color: gray;
+}
+.layout-container__settings{
+    padding: 4px;
+    display: flex;
+    justify-content: flex-end;
 }
 </style>
 <style>
 .draggable-mirror {
     opacity: 0.7;
-}
-.bg-pink {
-    background-color: pink;
 }
 </style>

@@ -1,7 +1,7 @@
 import _Vue from "vue";
 import LayoutContainerComponent from "./LayoutContainer.vue";
-import LayoutContainerItemComponent from "@/components/LayoutContainerItem.vue";
-import LayoutContainerRowComponent from "@/components/LayoutContainerRow.vue";
+import LayoutContainerItemComponent from "./LayoutContainerItem.vue";
+import LayoutContainerRowComponent from "./LayoutContainerRow.vue";
 
 declare global {
   interface Window {

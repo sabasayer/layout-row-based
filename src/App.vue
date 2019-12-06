@@ -1,13 +1,19 @@
 <template>
     <div id="app">
         <h4>SABASAYER layout-row-based</h4>
-        <layout-container :rows="rows" :layout-items.sync="items" edit-mode />
+        <layout-container :rows.sync="rows" :layout-items.sync="items" edit-mode >
+            <template #col-before>col before</template>
+            <template #col-after>col after</template>
+            <template #default="{id}">
+                id : {{id}}
+            </template>
+        </layout-container>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import LayoutContainerComponent from "@/components/LayoutContainer.vue";
+import LayoutContainerComponent from "./components/LayoutContainer.vue";
 import { LayoutItem, LayoutRow } from "../types/lib/layout-row";
 
 @Component({
@@ -37,5 +43,13 @@ export default class App extends Vue {
     text-align: center;
     color: #2c3e50;
     margin-top: 60px;
+}
+
+.layout-container{
+    border: 1px solid #ededed
+}
+
+.layout-container__cell{
+    background-color: aliceblue;
 }
 </style>

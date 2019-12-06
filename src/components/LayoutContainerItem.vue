@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import { LayoutItem } from "../../types/lib/layout-row";
+import { LayoutItem } from "../lib/layout-row";
 
 @Component
 export default class LayoutContainerItemComponent extends Vue {

@@ -10,17 +10,66 @@
         >
             <slot :col="col"></slot>
         </div>
+        <div
+            v-if="editMode"
+            @mouseenter="onMouseenter"
+            @mouseleave="onMouseLeave"
+            class="layout-container__row-settings"
+        >
+            <transition name="slide-left" mode="out-in">
+                <div v-if="isSettingsVisible">
+                    <v-button
+                        v-if="row.columns>1"
+                        @click="changeColumn(row.columns-1)"
+                        icon="minus"
+                    />
+
+                    <v-button
+                        v-if="row.columns<11"
+                        @click="changeColumn(row.columns+1)"
+                        icon="plus"
+                    />
+                </div>
+                <v-icon v-else icon="gear" />
+            </transition>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from "vue-property-decorator";
-import { LayoutRow } from "../../types/lib/layout-row";
+import { LayoutRow } from "../lib/layout-row";
+import IconComponent from "./icon.vue";
+import cloneDeep from "lodash/cloneDeep";
+import ButtonComponent from "./button.vue";
 
-@Component({})
+@Component({
+    components: {
+        "v-icon": IconComponent,
+        "v-button": ButtonComponent
+    }
+})
 export default class LayoutContainerRowComponent extends Vue {
     @Prop() readonly row!: LayoutRow;
     @Prop({ type: Boolean, default: false }) readonly editMode!: boolean;
+
+    isSettingsVisible: boolean = false;
+
+    changeColumn(newColumn: number) {
+        if (newColumn > 0 && newColumn < 12) {
+            let clone = cloneDeep(this.row);
+            clone.columns = newColumn;
+            this.$emit("update:row", clone);
+        }
+    }
+
+    onMouseenter() {
+        this.isSettingsVisible = true;
+    }
+
+    onMouseLeave() {
+        this.isSettingsVisible = false;
+    }
 }
 </script>
 
@@ -36,7 +85,6 @@ export default class LayoutContainerRowComponent extends Vue {
 .layout-container__cell {
     flex: 1;
     flex-shrink: 0;
-    background-color: aliceblue;
 }
 
 .layout-container__cell + .layout-container__cell {
@@ -45,5 +93,32 @@ export default class LayoutContainerRowComponent extends Vue {
 
 .layout-container__cell.edit-mode {
     padding: 10px;
+    border-left: 1px dotted #ededed;
+}
+
+.layout-container__row-settings {
+    padding: 4px;
+}
+
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
+    transition-duration: 0.2s;
+    transition-property: height, opacity, transform;
+    transition-timing-function: cubic-bezier(0.17, 0.04, 0.03, 0.94);
+    overflow: hidden;
+}
+
+.slide-left-enter,
+.slide-right-leave-active {
+    opacity: 0;
+    transform: translate(2em, 0);
+}
+
+.slide-left-leave-active,
+.slide-right-enter {
+    opacity: 0;
+    transform: translate(-2em, 0);
 }
 </style>
