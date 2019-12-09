@@ -1,6 +1,6 @@
 {
   "name": "@sabasayer/layout-row-based",
-  "version": "1.0.4",
+  "version": "1.0.8",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",

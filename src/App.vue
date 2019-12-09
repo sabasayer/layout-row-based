@@ -1,13 +1,22 @@
 <template>
     <div id="app">
         <h4>SABASAYER layout-row-based</h4>
-        <layout-container :rows.sync="rows" :layout-items.sync="items" edit-mode >
-            <template #col-before>col before</template>
-            <template #col-after>col after</template>
+        <layout-container
+            :rows="rows"
+            @update:rows="updateRows"
+            :layout-items.sync="items"
+            @update:layoutItems="updateLayout"
+            edit-mode
+            sortable
+        >
             <template #default="{id}">
-                id : {{id}}
+                <div style="padding:40px;background:pink;">id : {{id}} , order :{{getItem(id).order}}</div>
             </template>
         </layout-container>
+
+        <div>
+            {{items}}
+        </div>
     </div>
 </template>
 
@@ -29,9 +38,20 @@ export default class App extends Vue {
     ];
 
     items: LayoutItem[] = [
-        { row: 2, column: 2, order: 1, id: 1 },
-        { row: 1, column: 1, order: 1, id: 2 }
+        { row: 1, column: 1, order: 0, id: 1 },
+        { row: 1, column: 1, order: 1, id: 2 },
     ];
+
+    get getItem(){
+        return (id:number) => this.items.find(e=>e.id == id);
+    }
+
+    updateRows(rows: LayoutRow[]) {
+    }
+
+    updateLayout(layout: LayoutItem[]) {
+        console.log('layout',layout)
+    }
 }
 </script>
 
@@ -45,11 +65,11 @@ export default class App extends Vue {
     margin-top: 60px;
 }
 
-.layout-container{
-    border: 1px solid #ededed
+.layout-container {
+    border: 1px solid #ededed;
 }
 
-.layout-container__cell{
+.layout-container__cell {
     background-color: aliceblue;
 }
 </style>

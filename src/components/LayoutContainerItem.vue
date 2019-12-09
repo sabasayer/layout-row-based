@@ -14,4 +14,8 @@ export default class LayoutContainerItemComponent extends Vue {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.layout-container__item + .layout-container__item{
+    margin-top: 8px;
+}
+</style>

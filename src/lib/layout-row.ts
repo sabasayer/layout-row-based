@@ -7,6 +7,7 @@ export interface LayoutItem {
     id: string | number;
     row: number;
     column: number;
+    oldOrder:number;
     order: number;
     maxHeight?: number;
 }

@@ -85,6 +85,7 @@ export default class LayoutContainerRowComponent extends Vue {
 .layout-container__cell {
     flex: 1;
     flex-shrink: 0;
+    overflow: hidden;
 }
 
 .layout-container__cell + .layout-container__cell {
@@ -93,11 +94,11 @@ export default class LayoutContainerRowComponent extends Vue {
 
 .layout-container__cell.edit-mode {
     padding: 10px;
-    border-left: 1px dotted #ededed;
 }
 
 .layout-container__row-settings {
     padding: 4px;
+    border-left: 1px dotted #ededed;
 }
 
 .slide-left-enter-active,

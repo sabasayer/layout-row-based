@@ -12,3 +12,23 @@ export interface DragMoveEvent {
         source: HTMLElement;
     };
 }
+
+export interface DragOverEvent {
+    data: {
+        over:HTMLElement;
+        overContainer:HTMLElement
+        originalSource: HTMLElement;
+        source: HTMLElement;
+    };
+}
+
+export interface SortableSortedEvent {
+    data: {
+        dragEvent:DragOverEvent
+        newContainer:HTMLElement
+        oldContainer:HTMLElement
+        newIndex:number
+        oldIndex:number
+    };
+}
+
