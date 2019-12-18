@@ -10,13 +10,14 @@
             sortable
         >
             <template #default="{id}">
-                <div style="padding:40px;background:pink;">id : {{id}} , order :{{getItem(id).order}}</div>
+                <div
+                    style="padding:40px;"
+                    :style="{background:'rgba('+id*42+',200,'+id*30+')'}"
+                >id : {{id}} , order :{{getItem(id).order}}</div>
             </template>
         </layout-container>
 
-        <div>
-            {{items}}
-        </div>
+        <div>{{items}}</div>
     </div>
 </template>
 
@@ -40,17 +41,24 @@ export default class App extends Vue {
     items: LayoutItem[] = [
         { row: 1, column: 1, order: 0, id: 1 },
         { row: 1, column: 1, order: 1, id: 2 },
+        { row: 1, column: 1, order: 2, id: 3 },
+        { row: 1, column: 1, order: 3, id: 4 },
+        { row: 1, column: 2, order: 4, id: 5 },
+        { row: 1, column: 2, order: 0, id: 6 },
+        { row: 1, column: 2, order: 3, id: 7 },
+        { row: 1, column: 2, order: 5, id: 8 },
+        { row: 1, column: 2, order: 7, id: 9 },
+        { row: 1, column: 2, order: 9, id: 10 }
     ];
 
-    get getItem(){
-        return (id:number) => this.items.find(e=>e.id == id);
+    get getItem() {
+        return (id: number) => this.items.find(e => e.id == id);
     }
 
-    updateRows(rows: LayoutRow[]) {
-    }
+    updateRows(rows: LayoutRow[]) {}
 
     updateLayout(layout: LayoutItem[]) {
-        console.log('layout',layout)
+        
     }
 }
 </script>

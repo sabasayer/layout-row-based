@@ -18,7 +18,11 @@
                         v-for="(item, j) in getItems(row.row, col)"
                         :item="item"
                         :key="j"
+                        :edit-mode="editMode"
                     >
+                        <template #toolbar>
+                            <slot :id="item.id" name="item-toolbar"></slot>
+                        </template>
                         <slot :id="item.id"></slot>
                     </layout-container-item>
                 </slot>
@@ -79,9 +83,11 @@ export default class LayoutContainerComponent extends Vue {
 
     @Watch("layoutItems", { immediate: true, deep: true })
     onLayoutItemsChanged() {
-        if (this.layoutItems)
-            this.cloneLayoutItems = cloneDeep(this.layoutItems);
-        else this.cloneLayoutItems = [];
+        if (this.layoutItems) {
+            this.cloneLayoutItems = cloneDeep(this.layoutItems).sort(
+                (a, b) => a.order - b.order
+            );
+        } else this.cloneLayoutItems = [];
     }
 
     mounted() {
@@ -115,9 +121,7 @@ export default class LayoutContainerComponent extends Vue {
             ),
             {
                 draggable: ".layout-container__item",
-                mirror: {
-                    constrainDimensions: true
-                }
+                handle: ".layout-container__item-handle"
             }
         );
 
@@ -128,10 +132,7 @@ export default class LayoutContainerComponent extends Vue {
     initDragEvents() {
         this.draggableObj = new Droppable(this.$refs.container, {
             draggable: ".layout-container__item",
-            dropzone: ".layout-container__cell",
-            mirror: {
-                constrainDimensions: true
-            }
+            dropzone: ".layout-container__cell"
         });
 
         this.draggableObj.on("droppable:dropped", this.onDropped);
@@ -141,7 +142,7 @@ export default class LayoutContainerComponent extends Vue {
 
     onDragStop(e: any) {
         this.updateLayoutItems();
-        this.key++
+        this.key++;
     }
 
     onSorted(e: SortableSortedEvent) {
@@ -166,13 +167,13 @@ export default class LayoutContainerComponent extends Vue {
         let oldRow = item.row;
         let oldCol = item.column;
 
+        let newIndex = e.data.newIndex;
+        let oldIndex = e.data.oldIndex;
+
+        this.updateOtherItemsOrder(newIndex, item, oldCol, oldRow, oldIndex);
+
         if (areaRow != oldRow) item.row = +areaRow;
         if (areaCol != oldCol) item.column = +areaCol;
-
-        let newIndex = e.data.newIndex;
-
-        this.updateOtherItemsOrder(newIndex, item, oldCol, oldRow);
-
         item.order = newIndex;
     }
 
@@ -180,9 +181,48 @@ export default class LayoutContainerComponent extends Vue {
         newIndex: number,
         item: LayoutItem,
         oldCol: number,
-        oldRow: number
+        oldRow: number,
+        oldIndex: number
     ) {
+        let cellItems = this.cloneLayoutItems.filter(
+            e => e.row == item.row && e.column == item.column
+        );
+
+        cellItems
+            .sort((a, b) => a.order - b.order)
+            .forEach((item, i) => {
+                item.order = i;
+            });
+
         if (oldCol == item.column && oldRow == item.row) {
+            if (Math.abs(oldIndex - newIndex) == 1) {
+                let sameIndexItem = this.cloneLayoutItems.find(
+                    e =>
+                        e.row == item.row &&
+                        e.column == item.column &&
+                        e.id != item.id &&
+                        e.order == newIndex
+                );
+
+                if (sameIndexItem) {
+                    sameIndexItem.order = oldIndex;
+                }
+            } else {
+                this.cloneLayoutItems.forEach(ci => {
+                    if (
+                        ci.row == item.row &&
+                        ci.column == item.column &&
+                        ci.id != item.id &&
+                        ci.order >= newIndex &&
+                        ci.order < oldIndex
+                    ) {
+                        ci.order++;
+                    }
+                });
+            }
+        } 
+
+        /*if (oldCol == item.column && oldRow == item.row) {
             let sameIndexItem = this.cloneLayoutItems.find(
                 e =>
                     e.row == item.row &&
@@ -205,7 +245,7 @@ export default class LayoutContainerComponent extends Vue {
                     ci.order++;
                 }
             });
-        }
+        }*/
     }
 
     onDropped(e: DroppableDroppedEvent) {
@@ -265,5 +305,12 @@ export default class LayoutContainerComponent extends Vue {
 <style>
 .draggable-mirror {
     opacity: 0.7;
+    border: 2px dashed gray;
+}
+.draggable--over {
+    box-shadow: 0 0 4px gray;
+}
+.draggable-container--over {
+    box-shadow: 0 0 3px orange;
 }
 </style>
