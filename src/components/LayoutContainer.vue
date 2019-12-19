@@ -117,7 +117,7 @@ export default class LayoutContainerComponent extends Vue {
     initSortEvents() {
         this.draggableObj = new Sortable(
             (this.$refs.container as HTMLElement).querySelectorAll(
-                ".layout-container__cell"
+                ".layout-container__cell.edit-mode"
             ),
             {
                 draggable: ".layout-container__item",
@@ -132,7 +132,7 @@ export default class LayoutContainerComponent extends Vue {
     initDragEvents() {
         this.draggableObj = new Droppable(this.$refs.container, {
             draggable: ".layout-container__item",
-            dropzone: ".layout-container__cell"
+            dropzone: ".layout-container__cell.edit-mode"
         });
 
         this.draggableObj.on("droppable:dropped", this.onDropped);

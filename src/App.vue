@@ -16,7 +16,6 @@
                 >id : {{id}} , order :{{getItem(id).order}}</div>
             </template>
         </layout-container>
-
         <div>{{items}}</div>
     </div>
 </template>
