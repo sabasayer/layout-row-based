@@ -120,7 +120,8 @@ export default class LayoutContainerComponent extends Vue {
                 ".layout-container__cell.edit-mode"
             ),
             {
-                draggable: ".layout-container__item",
+                draggable:
+                    ".layout-container__cell.edit-mode > .layout-container__item",
                 handle: ".layout-container__item-handle"
             }
         );
@@ -131,7 +132,8 @@ export default class LayoutContainerComponent extends Vue {
 
     initDragEvents() {
         this.draggableObj = new Droppable(this.$refs.container, {
-            draggable: ".layout-container__item",
+            draggable:
+                ".layout-container__cell.edit-mode > .layout-container__item",
             dropzone: ".layout-container__cell.edit-mode"
         });
 
@@ -170,7 +172,7 @@ export default class LayoutContainerComponent extends Vue {
         let newIndex = e.data.newIndex;
         let oldIndex = e.data.oldIndex;
 
-        this.updateOtherItemsOrder(newIndex, item, oldCol, oldRow, oldIndex);
+        this.updateOtherItemsOrder(item, newIndex, oldIndex, oldCol, oldRow);
 
         if (areaRow != oldRow) item.row = +areaRow;
         if (areaCol != oldCol) item.column = +areaCol;
@@ -178,11 +180,11 @@ export default class LayoutContainerComponent extends Vue {
     }
 
     updateOtherItemsOrder(
-        newIndex: number,
         item: LayoutItem,
+        newIndex: number,
+        oldIndex: number,
         oldCol: number,
-        oldRow: number,
-        oldIndex: number
+        oldRow: number
     ) {
         let cellItems = this.cloneLayoutItems.filter(
             e => e.row == item.row && e.column == item.column
@@ -205,6 +207,8 @@ export default class LayoutContainerComponent extends Vue {
                 );
 
                 if (sameIndexItem) {
+                    console.log("same index", sameIndexItem.order, oldIndex);
+
                     sameIndexItem.order = oldIndex;
                 }
             } else {
@@ -216,36 +220,12 @@ export default class LayoutContainerComponent extends Vue {
                         ci.order >= newIndex &&
                         ci.order < oldIndex
                     ) {
+                        console.log("inc order", ci.order);
                         ci.order++;
                     }
                 });
             }
-        } 
-
-        /*if (oldCol == item.column && oldRow == item.row) {
-            let sameIndexItem = this.cloneLayoutItems.find(
-                e =>
-                    e.row == item.row &&
-                    e.column == item.column &&
-                    e.id != item.id &&
-                    e.order == newIndex
-            );
-
-            if (sameIndexItem) {
-                sameIndexItem.order = item.order;
-            }
-        } else {
-            this.cloneLayoutItems.forEach(ci => {
-                if (
-                    ci.row == item.row &&
-                    ci.column == item.column &&
-                    ci.id != item.id &&
-                    ci.order >= newIndex
-                ) {
-                    ci.order++;
-                }
-            });
-        }*/
+        }
     }
 
     onDropped(e: DroppableDroppedEvent) {
