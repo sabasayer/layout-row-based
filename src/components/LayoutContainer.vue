@@ -1,14 +1,18 @@
 <template>
     <div ref="container" class="layout-container">
         <div v-if="editMode" class="layout-container__settings">
-            <v-button v-if="cloneRows.length > 0" @click="removeRow" icon="minus" />
+            <v-button
+                v-if="cloneRows.length > 0"
+                @click="removeRow"
+                icon="minus"
+            />
             <v-button @click="addRow" icon="plus" />
         </div>
         <layout-container-row
             v-for="(row, i) in cloneRows"
-            :key="i+'_'+key"
+            :key="`${i} ${key}`"
             :row="row"
-            @update:row="onRowUpdated(...arguments,i)"
+            @update:row="onRowUpdated(...arguments, i)"
             :edit-mode="editMode"
         >
             <template #default="{col}">
@@ -207,8 +211,6 @@ export default class LayoutContainerComponent extends Vue {
                 );
 
                 if (sameIndexItem) {
-                    console.log("same index", sameIndexItem.order, oldIndex);
-
                     sameIndexItem.order = oldIndex;
                 }
             } else {
@@ -220,7 +222,6 @@ export default class LayoutContainerComponent extends Vue {
                         ci.order >= newIndex &&
                         ci.order < oldIndex
                     ) {
-                        console.log("inc order", ci.order);
                         ci.order++;
                     }
                 });
